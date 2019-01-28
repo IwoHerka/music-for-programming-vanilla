@@ -1,3 +1,8 @@
+;    ______________________________________________________________________
+;   |:..                                                      ``:::%%%%%%HH|
+;   |%%%:::::..    M u s i c   f o r   p r o g r a m m i n g     `:::::%%%%|
+;   |HH%%%%%:::::....._______________________________________________::::::|
+
 (ns mfp
   (:require [clojure.string :as string]))
 
@@ -40,13 +45,89 @@
   ((fn loop-tick [] (do (glitch-tick)
                         (js/setTimeout loop-tick (rand-int 16 400))))))
 
-(defn init []
+(defn format-hhmmss [duration]
+  (let [tostr (fn [xs] (if (< xs 10) (str "0" xs) xs))
+        secs (int duration)
+        hours (Math/floor (/ secs 3600))
+        minutes (Math/floor (/ (- secs (* hours 3600)) 60))
+        seconds (- secs (* hours 3600) (* minutes 60))]
+    (str (tostr hours) \: (tostr minutes) \: (tostr seconds))))
+
+
+(def context
+  (let [Constructor (or (.-AudioContext js/window)
+                        (.-webkitAudioContext js/window)
+                        nil)]
+    (Constructor.)))
+
+(defn boop []
+  (if context
+    (let [oscill (.createOscillator context)
+          gain (.createGain context)]
+      (do
+        (set! (.-type oscill) "square")
+        (set! (.-value (.-frequency oscill)) 5555)
+        (set! (.-value (.-gain gain)) 0.125)
+        (.connect oscill gain)
+        (.connect gain (.-destination context))
+        (.start oscill (.-currentTime context))
+        (.stop oscill (+ 0.025 (.-currentTime context)))))))
+
+(defn get-player []
+  {:timeout nil
+   :auto-update false
+   :state :unloaded
+   :time-display (.getElementById js/document "time-display")
+   :audio (.getElementById js/document "audio")
+   :play-pause-btn (.getElementById js/document "play-pause-btn")
+   :stop-btn (.getElementById js/document "stop-btn")
+   :rewind-btn (.getElementById js/document "rewind-btn")
+   :forward-btn (.getElementById js/document "forward-btn")})
+
+(defn play-pause [player]
+  (let [_player (if (= (player :state) :stopped)
+                    (assoc player :state :paused)
+                    player)]
   (do
-    ; Add theme cycling.
-    (let [theme-link (.getElementById js/document "themeLink")]
-      (.addEventListener theme-link "click" cycle-theme false))
-    ; Initialize text glitch;
-    (init-glitch)))
+    (boop)
+    (cond
+      (= (player :state) :stopped)
+      (do
+        (.add (.-classList (player :stop-btn)) "active")))
+    (if (= (_player :state) :paused)
+      (do
+        (println "bbb")
+        (assoc player :state :play)
+        (.play (player :audio))))
+    )))
+
+(defn init-audio [player]
+  (let [player (assoc player :state :stopped)]
+  (do
+    (set! (.-innerHTML (player :time-display))
+          (format-hhmmss (.-duration (player :audio))))
+    (.add (.-classList (player :play-pause-btn)) "active")
+    (.addEventListener (player :play-pause-btn)
+                       "click" #(play-pause player) false))))
+
+(defn init-player [player]
+  (do
+    (set! (.-onloadedmetadata (player :audio)) #(init-audio player)))
+    (.load (player :audio)))
+
+(defn init []
+  (let [player (get-player)]
+    (do
+      (init-player player)
+      ; Add theme cycling.
+      (let [theme-link (.getElementById js/document "themeLink")]
+        (.addEventListener theme-link "click" cycle-theme false))
+      ; |  _  |
+      ; |=(o)=|    Sienar Fleet Systems'
+      ; |     |    TIE/In Space Superiority Starfighter
+      (boop)
+      ; Initialize text glitch;
+      (init-glitch))))
 
 (.addEventListener js/window "DOMContentLoaded" init)
 

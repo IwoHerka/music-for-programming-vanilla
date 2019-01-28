@@ -36,14 +36,18 @@
 
             <h2>SYNOPSIS</h2>
             <p class="synopsis">
-                <b>mfp</b> [<b>-name</b> <id="title" i>"01. Jo Johnson"</i>] [<b>-time</b> <id="time" i>01.02.30</i>]
-                <!-- Audio player -->
-				<audio src="http://datashat.net/music_for_programming_26-abstraction.mp3" id="player">
+                <b>mfp</b>
+                [<b>-name</b> <i id="title">"01. Jo Johnson"</i>]
+                [<b>-time</b> <i id="time-display">01.02.30</i>]
+				<audio src="http://datashat.net/music_for_programming_26-abstraction.mp3" id="audio">
 					Your browser does not support the &lt;<span class="fuschia">audio</span>&gt; tag.<br><br>
 				</audio>
             </p>
             <p class="synopsis">
-                [<b>-play</b>] [<b>-stop</b>] [<b>-backward</b> <i>-30s</i>] [<b>-forward</b> <i>+30s</i>]
+                [<a href="#"><b id="play-pause-btn">-play</b></a>]
+                [<b id="stop-btn">-stop</b>]
+                [<b id="rewind-btn">-backward</b> <i>-30s</i>]
+                [<b id="forward-btn">-forward</b> <i>+30s</i>]
             </p>
             <p class="synopsis">
                 [<b>-previous</b>] [<b>-next</b>]
