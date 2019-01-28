@@ -74,46 +74,42 @@
         (.stop oscill (+ 0.025 (.-currentTime context)))))))
 
 (defn get-player []
-  {:timeout nil
-   :auto-update false
-   :state :unloaded
-   :time-display (.getElementById js/document "time-display")
-   :audio (.getElementById js/document "audio")
-   :play-pause-btn (.getElementById js/document "play-pause-btn")
-   :stop-btn (.getElementById js/document "stop-btn")
-   :rewind-btn (.getElementById js/document "rewind-btn")
-   :forward-btn (.getElementById js/document "forward-btn")})
+  (atom {:timeout nil
+         :auto-update false
+         :state :unloaded
+         :time-display (.getElementById js/document "time-display")
+         :audio (.getElementById js/document "audio")
+         :play-pause-btn (.getElementById js/document "play-pause-btn")
+         :stop-btn (.getElementById js/document "stop-btn")
+         :rewind-btn (.getElementById js/document "rewind-btn")
+         :forward-btn (.getElementById js/document "forward-btn")}))
 
 (defn play-pause [player]
-  (let [_player (if (= (player :state) :stopped)
-                    (assoc player :state :paused)
-                    player)]
   (do
     (boop)
-    (cond
-      (= (player :state) :stopped)
+    (if (= (@player :state) :stopped)
       (do
-        (.add (.-classList (player :stop-btn)) "active")))
-    (if (= (_player :state) :paused)
+        (swap! player assoc :state :paused)
+        (.add (.-classList (@player :stop-btn)) "active")))
+    (if (= (@player :state) :paused)
       (do
         (println "bbb")
-        (assoc player :state :play)
-        (.play (player :audio))))
-    )))
+        (swap! player assoc :state :play)
+        (.play (@player :audio))))))
 
 (defn init-audio [player]
-  (let [player (assoc player :state :stopped)]
   (do
-    (set! (.-innerHTML (player :time-display))
-          (format-hhmmss (.-duration (player :audio))))
-    (.add (.-classList (player :play-pause-btn)) "active")
-    (.addEventListener (player :play-pause-btn)
-                       "click" #(play-pause player) false))))
+    (swap! player assoc :state :stopped)
+    (set! (.-innerHTML (@player :time-display))
+          (format-hhmmss (.-duration (@player :audio))))
+    (.add (.-classList (@player :play-pause-btn)) "active")
+    (.addEventListener (@player :play-pause-btn)
+                       "click" #(play-pause player) false)))
 
 (defn init-player [player]
   (do
-    (set! (.-onloadedmetadata (player :audio)) #(init-audio player)))
-    (.load (player :audio)))
+    (set! (.-onloadedmetadata (@player :audio)) #(init-audio player)))
+    (.load (@player :audio)))
 
 (defn init []
   (let [player (get-player)]
@@ -130,4 +126,3 @@
       (init-glitch))))
 
 (.addEventListener js/window "DOMContentLoaded" init)
-
