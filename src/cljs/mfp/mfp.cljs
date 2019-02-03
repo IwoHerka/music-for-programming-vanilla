@@ -40,10 +40,12 @@
                      "css/style.css")]
       (.setAttribute style-link "href" new-link)))
 
+(defn loop-tick [] (do (glitch-tick)
+                       (js/setTimeout loop-tick (rand-int 16 400))))
+
 (defn init-glitch []
   ; Set random timeout on the glitch-tick.
-  ((fn loop-tick [] (do (glitch-tick)
-                        (js/setTimeout loop-tick (rand-int 16 400))))))
+  (loop-tick))
 
 (defn format-hhmmss [duration]
   (let [tostr (fn [xs] (if (< xs 10) (str "0" xs) xs))
@@ -52,7 +54,6 @@
         minutes (Math/floor (/ (- secs (* hours 3600)) 60))
         seconds (- secs (* hours 3600) (* minutes 60))]
     (str (tostr hours) \: (tostr minutes) \: (tostr seconds))))
-
 
 (def context
   (let [Constructor (or (.-AudioContext js/window)
@@ -73,6 +74,16 @@
         (.start oscill (.-currentTime context))
         (.stop oscill (+ 0.025 (.-currentTime context)))))))
 
+(defn update [player]
+  (do
+    (println "update player")
+    (set! (.-innerHTML (@player :time-display))
+          (format-hhmmss (.-currentTime (@player :audio))))
+    (if (@player :auto-update)
+      (js/setTimeout #(update player) 1000))
+    (if (= (.-currentTime (@player :audio)) (.-duration (@player :audio)))
+      (stop player))))
+
 (defn get-player []
   (atom {:timeout nil
          :auto-update false
@@ -82,7 +93,38 @@
          :play-pause-btn (.getElementById js/document "play-pause-btn")
          :stop-btn (.getElementById js/document "stop-btn")
          :rewind-btn (.getElementById js/document "rewind-btn")
-         :forward-btn (.getElementById js/document "forward-btn")}))
+         :forward-btn (.getElementById js/document "forward-btn")
+         :stop-btn-listener nil
+         :rewind-btn-listener nil
+         :forward-btn-listener nil}))
+
+(defn stop [player]
+  (do
+    (boop)
+    (swap! player assoc :state :stopped)
+    (.pause (@player :audio))
+    (set! (.-currentTime (@player :audio)) 0)
+    (js/clearTimeout loop-tick)
+    (swap! player assoc :auto-update false)
+    (update player)
+    (set! (.-innerHTML (@player :play-pause-btn)) "-play")
+    (.removeEventListener (@player :stop-btn) "click" (@player :stop-btn-listner))
+    (.remove (.-classList (@player :stop-btn)) "active")
+    (.removeEventListener (@player :rewind-btn) "click" (@player :rewind-btn-listner))
+    (.remove (.-classList (@player :rewind-btn)) "active")
+    (.removeEventListener (@player :forward-btn) "click" (@player :forward-btn-listner))
+    (.remove (.-classList (@player :forward-btn)) "active")
+    (println "stop")))
+
+(defn rewind [player]
+  (do
+    (println "rewind")
+    ))
+
+(defn forward [player]
+  (do
+    (println "forward")
+    ))
 
 (defn play-pause [player]
   (do
@@ -90,18 +132,39 @@
     (if (= (@player :state) :stopped)
       (do
         (swap! player assoc :state :paused)
-        (.add (.-classList (@player :stop-btn)) "active")))
+        (.add (.-classList (@player :stop-btn)) "active")
+        (.add (.-classList (@player :rewind-btn)) "active")
+        (.add (.-classList (@player :forward-btn)) "active")
+        ; Check if listeners were already created. If yes, reuse them.
+        (if (= (@player :stop-btn-listener) nil)
+          (do
+            (swap! player assoc :stop-btn-listener #(stop player))
+            (.addEventListener (@player :stop-btn)
+                               "click" (@player :stop-btn-listener) false)))
+        (if (= (@player :rewind-btn-listener nil))
+          (do
+            (swap! player assoc :rewind-btn-listener #(rewind player))
+            (.addEventListener (@player :rewind-btn)
+                               "click" #(rewind player) false)))
+        (if (= (@player :forward-btn-listener nil))
+          (do
+            (swap! player assoc :forward-btn-listener #(forward player))
+            (.addEventListener (@player :forward-btn)
+                               "click" #(forward player) false)))))
     (if (= (@player :state) :paused)
       (do
-        (println "bbb")
         (swap! player assoc :state :play)
-        (.play (@player :audio))))))
+        (.play (@player :audio))
+        (swap! player assoc :auto-update true)
+        (update player)
+        (set! (.-innerHTML (@player :play-pause-btn)) "-pause")))))
 
 (defn init-audio [player]
   (do
     (swap! player assoc :state :stopped)
     (set! (.-innerHTML (@player :time-display))
           (format-hhmmss (.-duration (@player :audio))))
+    (update player)
     (.add (.-classList (@player :play-pause-btn)) "active")
     (.addEventListener (@player :play-pause-btn)
                        "click" #(play-pause player) false)))
