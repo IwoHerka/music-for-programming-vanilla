@@ -4,7 +4,8 @@
 ;   |HH%%%%%:::::....._______________________________________________::::::|
 
 (ns mfp
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [episodes :as data]))
 
 (println (string/join
   ["Hey there!\nIf you're looking for the code then check out: "
@@ -22,26 +23,37 @@
 (def junk ["#", "@", "%", "*", "&amp;", "&lt;", "&gt;", "_", "=", "+", "[",
            "]", "|", "-", "!", "?","X"])
 
+; Generate random integer.
 (defn rand-int [min, max] (Math/round (+ min (* (Math/random) (- max min)))))
 
-(defn replace-chars [ch]
+; With probability N, replace character with random junk.
+(defn replace-char [ch]
   (if (> (rand-int 0 100) 85) (junk (rand-int 0 16)) ch))
 
+; Cycle to next title, generate random glitch.
 (defn glitch-tick []
   (let [text (activities (rand-int 0 (- (count activities) 2)))
         characters (string/split text #"")
-        glitched (string/join (map replace-chars characters))]
+        glitched (string/join (map replace-char characters))]
     (set! (.-innerHTML (.getElementById js/document "glitch")) glitched)))
 
 (defn cycle-theme []
+  ; Cycle to the next CSS theme.
   (let [style-link (.getElementById js/document "styleLink")
         new-link (if (string/ends-with? (.-href style-link) "style.css")
                      "css/style-alt.css"
                      "css/style.css")]
       (.setAttribute style-link "href" new-link)))
 
-(defn loop-tick [] (do (glitch-tick)
-                       (js/setTimeout loop-tick (rand-int 16 400))))
+(defn loop-tick []
+  ; Start looping glitch-tick every [16-400] ms.
+  (do
+    (glitch-tick)
+    (if (> @glitch-counter 0)
+      (do
+        (swap! glitch-counter dec)
+        (js/setTimeout loop-tick (rand-int 16 400)))
+      (set! (.-innerHTML (.getElementById js/document "glitch")) "programming"))))
 
 (defn init-glitch []
   ; Set random timeout on the glitch-tick.
@@ -76,13 +88,18 @@
 
 (defn update [player]
   (do
-    (println "update player")
     (set! (.-innerHTML (@player :time-display))
           (format-hhmmss (.-currentTime (@player :audio))))
-    (if (@player :auto-update)
-      (js/setTimeout #(update player) 1000))
     (if (= (.-currentTime (@player :audio)) (.-duration (@player :audio)))
       (stop player))))
+
+(defn loop-player-update [player]
+  (if (@player :auto-update)
+    (do
+      (update player)
+      (js/setTimeout #(loop-player-update player) 1000))))
+
+(def glitch-counter (atom 30))
 
 (defn get-player []
   (atom {:timeout nil
@@ -118,17 +135,21 @@
 
 (defn rewind [player]
   (do
-    (println "rewind")
-    ))
+    (let [time (max 0 (- (.-currentTime (@player :audio)) 30))]
+      (set! (.-currentTime (@player :audio)) time))
+    (update player)))
 
 (defn forward [player]
   (do
-    (println "forward")
-    ))
+    (let [time (min (.-duration (@player :audio)) (+ (.-currentTime (@player :audio)) 30))]
+      (set! (.-currentTime (@player :audio)) time))
+    (update player)))
 
 (defn play-pause [player]
+  ; Play/pause button handler.
   (do
     (boop)
+    ; Check if player is stopped or
     (if (= (@player :state) :stopped)
       (do
         (swap! player assoc :state :paused)
@@ -145,39 +166,81 @@
           (do
             (swap! player assoc :rewind-btn-listener #(rewind player))
             (.addEventListener (@player :rewind-btn)
-                               "click" #(rewind player) false)))
+                               "click" (@player :rewind-btn-listener) false)))
         (if (= (@player :forward-btn-listener nil))
           (do
             (swap! player assoc :forward-btn-listener #(forward player))
             (.addEventListener (@player :forward-btn)
-                               "click" #(forward player) false)))))
+                               "click" (@player :forward-btn-listener) false)))))
     (if (= (@player :state) :paused)
       (do
+        ; Pause audio.
         (swap! player assoc :state :play)
         (.play (@player :audio))
         (swap! player assoc :auto-update true)
-        (update player)
-        (set! (.-innerHTML (@player :play-pause-btn)) "-pause")))))
+        (loop-player-update player)
+        (set! (.-innerHTML (@player :play-pause-btn)) "-pause"))
+      (do
+        ; Resume audio.
+        (swap! player assoc :state :paused)
+        (.pause (@player :audio))
+        (swap! player assoc :auto-update false)
+        (loop-player-update player)
+        (set! (.-innerHTML (@player :play-pause-btn)) "-resume")))))
 
 (defn init-audio [player]
+  ; Initialize audio player.
   (do
+    ; Set state to stopped.
     (swap! player assoc :state :stopped)
+    ; Initially display audio duration.
     (set! (.-innerHTML (@player :time-display))
           (format-hhmmss (.-duration (@player :audio))))
-    (update player)
+    (loop-player-update player)
+    ; Initialize play-pause button.
     (.add (.-classList (@player :play-pause-btn)) "active")
     (.addEventListener (@player :play-pause-btn)
                        "click" #(play-pause player) false)))
 
-(defn init-player [player]
+(defn get-compiler-li [compinfo]
+  (str "<li><a href=\"" (compinfo 1) "\">" (compinfo 0) "</a></li>"))
+
+(defn get-synopsis-li [track]
+  (str "<li id=\"#\">" (track 0) "</li>"))
+
+(defn get-episode-li [[ep i]]
+  (str "<li><b><a href=\"#\">-"
+       (if (>= i 10) i (str "0" i))
+       ", "
+       (ep :title)
+       "</a></b> [<i>"
+       (string/join " | " (ep :genres))
+       "</i>]</li>"))
+
+(defn init-episodes [eps]
+  (let [ol (.getElementById js/document "episodes")]
+    ; (for [ep eps i (range)] (set! (.-innerHTML ol) (get-episode-li i ep)))))
+    (set! (.-innerHTML ol) (apply str (map get-episode-li (map vector eps (range)))))))
+
+(defn init-synopsis [ep]
+  (let [ol (.getElementById js/document "synopsis")]
+    (set! (.-innerHTML ol) (apply str (map get-synopsis-li (ep :track-list))))))
+
+(defn init-compilers [compilers]
+  (let [ol (.getElementById js/document "compilers")]
+    (set! (.-innerHTML ol) (apply str (map get-compiler-li compilers)))))
+
+(defn init-track [episode]
   (do
-    (set! (.-onloadedmetadata (@player :audio)) #(init-audio player)))
-    (.load (@player :audio)))
+    (set! (.-innerHTML (.getElementById js/document "title")) (episode :title))
+    (set! (.-innerHTML (.getElementById js/document "duration")) (episode :duration))
+    (set! (.-innerHTML (.getElementById js/document "compiled-by")) (episode :compiled-by))
+    (set! (.-src (.getElementById js/document "audio")) (episode :link))
+  ))
 
 (defn init []
   (let [player (get-player)]
     (do
-      (init-player player)
       ; Add theme cycling.
       (let [theme-link (.getElementById js/document "themeLink")]
         (.addEventListener theme-link "click" cycle-theme false))
@@ -185,7 +248,13 @@
       ; |=(o)=|    Sienar Fleet Systems'
       ; |     |    TIE/In Space Superiority Starfighter
       (boop)
-      ; Initialize text glitch;
-      (init-glitch))))
+      (init-compilers data/compilers)
+      (init-synopsis (data/episodes 0))
+      (init-track (data/episodes 0))
+      (init-episodes data/episodes)
+      ; Initialize audio player when metadata is loaded.
+      (set! (.-onloadedmetadata (@player :audio)) #(init-audio player))
+      (.load (@player :audio))
+      (loop-tick))))
 
 (.addEventListener js/window "DOMContentLoaded" init)

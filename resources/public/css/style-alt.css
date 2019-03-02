@@ -1,0 +1,37 @@
+html {
+    background: #2637dd;
+    font-family: "Roboto Mono", monospace;
+    font-weight: 500;
+    color: #fff;
+}
+
+h2 {
+    background: white;
+    color: #2637dd;
+    padding: 5px;
+    width: fit-content;
+}
+
+h1 {
+    padding: 5px;
+    background: white;
+    color: #2637dd;
+    margin-top: 10px;
+}
+
+.column {
+    padding: 10px;
+    border: white solid;
+}
+
+i {
+    color: #12ffff;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: "Share Tech Mono";
+}
+
+h2 {
+    font-size: 20px !important;
+}
