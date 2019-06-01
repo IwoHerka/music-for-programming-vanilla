@@ -8,7 +8,7 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 
     <link href="css/base-style.css" rel="stylesheet"/>
-    <link href="css/style.css" rel="stylesheet" id="styleLink"/>
+    <link href="css/solarized.css" rel="stylesheet" id="styleLink"/>
 
     <script type="text/javascript" src="mfp.js"></script>
 
@@ -19,7 +19,6 @@
 <link
 href="https://fonts.googleapis.com/css?family=Roboto+Mono|Share+Tech+Mono|VT323"
 rel="stylesheet">
-
 
 </head>
 <body>
@@ -36,9 +35,9 @@ rel="stylesheet">
             <h2>ABOUT</h2>
 
             <p>
-            A series of mixes compiled by me and my friends to aid
-            concentration and increase productivity. Compatible with
-            programming and other activities.
+                A series of mixes compiled by me and my friends to aid
+                concentration and increase productivity. Compatible with
+                programming and other activities.
             </p>
 
             <h2>CONTROLS</h2>
@@ -49,7 +48,8 @@ rel="stylesheet">
                 [<b>-time</b> <i id="time-display"></i>]
 
 				<audio src="" id="audio">
-					Your browser does not support the &lt;<span class="fuschia">audio</span>&gt; tag.<br><br>
+					Your browser does not support the &lt;
+                    <span class="fuschia">audio</span>&gt; tag.<br><br>
 				</audio>
             </p>
 
@@ -61,7 +61,8 @@ rel="stylesheet">
             </p>
 
             <p class="synopsis">
-                [<a id="previous"><b>-previous</b></a>] [<a id="next"><b>-next</b></a>]
+                [<a id="previous" href="#"><b>-previous</b></a>]
+                [<a id="next" href="#"><b>-next</b></a>]
             </p>
 
             <h2>SYNOPSIS</h2>
@@ -79,30 +80,29 @@ rel="stylesheet">
             <ul id="episodes"></ul>
 
             <h2>OPTIONS</h2>
+
             <p>
                 <a href="#" id="themeLink"><b>--switch-theme</b></a>
                 <a href="#" id="90s_mode"><b>--90s-mode</b></a>
                 <a href="#" id="cyberpunk_mode"><b>--cyberpunk-mode</b></a>
             </p>
+
             <h2>CREDITS</h2>
-            <p>
-            Compilers (in alphabetical order):
-            </p>
 
-            <ol id="compilers">
-                <li>Aleksandra Bałczewska</li>
-                <li>Gabriela Szymczak</li>
-                <li>Mateusz Papiernik</li>
-                <li>Iga Stankowska</li>
-            </ol>
+            <p>Compilers (in alphabetical order):</p>
 
-            <p>
-            Thank you all for submissions.
-            </p>
+            <ol id="compilers"></ol>
 
-            <nav>
-                <a>test</a>
-            </nav>
+            <p>Thank you all for submissions.</p>
+
+            <h2>KEYBOARD</h2>
+
+            <ul>
+                <li><b>[SPACE]</b> play/pause</li>
+                <li><b>[LEFT]</b> previous episode</li>
+                <li><b>[RIGHT]</b> next episode</li>
+            </ul>
+
         </div>
     </div>
 </body>

@@ -1,5 +1,4 @@
-(ns episodes
-  (:require [clojure.string :as string]))
+(ns episodes)
 
 (def episodes
   [{:title "iwo-herka-1"

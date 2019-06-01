@@ -1,31 +1,51 @@
+b { color:#502000; }
+i { color:#006000; }
+
+h2 {
+    color: #A00000;
+}
+
+h3 {
+    color:#600000;
+}
+
 html {
-    background: #2637dd;
     font-family: "Roboto Mono", monospace;
     font-weight: 500;
-    color: #fff;
 }
 
 h2 {
-    background: white;
-    color: #2637dd;
     padding: 5px;
     width: fit-content;
+    color: #A00000;
+}
+
+#page-title {
+    font-style: italic;
+    font-size: 40px;
+}
+
+#episode_num {
+    color: #A00000;
+}
+
+#glitch {
+    display: block;
 }
 
 h1 {
     padding: 5px;
-    background: white;
-    color: #2637dd;
     margin-top: 10px;
+    color: #008000;
 }
 
 .column {
     padding: 10px;
     border: white solid;
+    background: #fbfbfb;
 }
 
 i {
-    color: #12ffff;
 }
 
 h1, h2, h3, h4, h5 {

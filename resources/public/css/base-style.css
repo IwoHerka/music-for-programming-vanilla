@@ -3,6 +3,7 @@ html {
 }
 
 .main {
+    margin: 4rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -121,7 +122,10 @@ ul {
 
 #a:link    { text-decoration: none; color: blue; }
 #a:visited { text-decoration: none; color: blue; }
-a:hover   { text-decoration: underline; color: red; }
+
+a:hover   { text-decoration: none; color: red; }
+b:hover   { text-decoration: none; color: red; }
+
 a:active  { text-decoration: underline; background-color: #FFD0D0; }
 
 .footer p {
