@@ -1,0 +1,57 @@
+b { color:#502000; }
+i { color:#006000; }
+
+h2 {
+    color: #A00000;
+}
+
+h3 {
+    color:#600000;
+}
+
+html {
+    font-family: "Roboto Mono", monospace;
+    font-weight: 500;
+}
+
+h2 {
+    padding: 5px;
+    width: fit-content;
+    color: #A00000;
+}
+
+#page-title {
+    font-style: italic;
+    font-size: 40px;
+}
+
+#episode_num {
+    color: #A00000;
+}
+
+#glitch {
+    display: block;
+}
+
+h1 {
+    padding: 5px;
+    margin-top: 10px;
+    color: #008000;
+}
+
+.column {
+    padding: 10px;
+    border: white solid;
+    background: #fbfbfb;
+}
+
+i {
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: "Share Tech Mono";
+}
+
+h2 {
+    font-size: 20px !important;
+}

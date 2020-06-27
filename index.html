@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>music_for_programming</title>
+    <meta name="description" content="[description]">
+	<meta name="author" content="Iwo Herka">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <link href="css/base-style.css" rel="stylesheet"/>
+    <link href="css/solarized.css" rel="stylesheet" id="styleLink"/>
+
+    <script type="text/javascript" src="mfp.js"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+    <link
+    href="https://fonts.googleapis.com/css?family=Roboto+Mono|Share+Tech+Mono"
+    rel="stylesheet">
+<link
+href="https://fonts.googleapis.com/css?family=Roboto+Mono|Share+Tech+Mono|VT323"
+rel="stylesheet">
+
+</head>
+<body>
+    <div class="row main">
+        <div class="column" style="width: 600px;">
+            <h1>
+                <span class="headline">
+                    <span id="episode_num">EP(1)</span>
+                    <span id="page-title">Music for <span id="glitch">programming</span></span>
+                    <span id="episode_num">EP(1)</span>
+                </span>
+            </h1>
+
+            <h2>ABOUT</h2>
+
+            <p>
+                A series of mixes compiled by me and my friends to aid
+                concentration and increase productivity. Compatible with
+                programming and other activities.
+            </p>
+
+            <h2>CONTROLS</h2>
+
+            <p class="synopsis">
+                <b>mfp</b>
+                [<b>-name</b> <i id="title"></i>]
+                [<b>-time</b> <i id="time-display"></i>]
+
+				<audio src="" id="audio">
+					Your browser does not support the &lt;
+                    <span class="fuschia">audio</span>&gt; tag.<br><br>
+				</audio>
+            </p>
+
+            <p class="synopsis">
+                [<a href="#"><b id="play-pause-btn">-play</b></a>]
+                [<a href="#"><b id="stop-btn">-stop</b></a>]
+                [<a id="rewind-btn" href="#"><b>-backward</b> <i>-30s</i></a>]
+                [<a id="forward-btn" href="#"><b>-forward</b> <i>+30s</i></a>]
+            </p>
+
+            <p class="synopsis">
+                [<a id="previous" href="#"><b>-previous</b></a>]
+                [<a id="next" href="#"><b>-next</b></a>]
+            </p>
+
+            <h2>SYNOPSIS</h2>
+
+            <ol id="synopsis"></ol>
+
+            <p>
+                Compiled by: <span id="compiled-by"></span><br>
+                Length: <span id="duration"></span><br>
+                <a id="link" href="#">download_file.mp3</a><br>
+            </p>
+
+            <h2>EPISODES</h2>
+
+            <ul id="episodes"></ul>
+
+            <h2>OPTIONS</h2>
+
+            <p>
+                <a href="#" id="themeLink"><b>--switch-theme</b></a>
+                <a href="#" id="90s_mode"><b>--90s-mode</b></a>
+                <a href="#" id="cyberpunk_mode"><b>--cyberpunk-mode</b></a>
+            </p>
+
+            <h2>CREDITS</h2>
+
+            <p>Compilers (in alphabetical order):</p>
+
+            <ol id="compilers"></ol>
+
+            <p>Thank you all for submissions.</p>
+
+            <h2>KEYBOARD</h2>
+
+            <ul>
+                <li><b>[SPACE]</b> play/pause</li>
+                <li><b>[LEFT]</b> previous episode</li>
+                <li><b>[RIGHT]</b> next episode</li>
+            </ul>
+
+        </div>
+    </div>
+</body>
+</html>
